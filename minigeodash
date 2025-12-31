@@ -8,13 +8,13 @@
   body {
     margin: 0;
     background: #222;
-    overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    color: white;
+    overflow: hidden;
     font-family: Arial, sans-serif;
+    color: white;
   }
   canvas {
     background: #333;
@@ -137,10 +137,8 @@ function gameLoop() {
 }
 
 document.addEventListener('keydown', (e) => {
-    if (e.code === 'Space' || e.code === 'ArrowUp') {
-        if (player.grounded) {
-            player.dy = player.jumpForce;
-        }
+    if ((e.code === 'Space' || e.code === 'ArrowUp') && player.grounded) {
+        player.dy = player.jumpForce;
     }
 });
 
@@ -148,3 +146,4 @@ gameLoop();
 </script>
 </body>
 </html>
+
