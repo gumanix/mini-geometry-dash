@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📂 Nástroje Menu - Richard</title>
+  <style>
+    :root {
+      --bg: #0f1720;
+      --card: #1e293b;
+      --accent: #ef4444;
+      --accent-hover: #f87171;
+      --text: #e6eef6;
+      --muted: #94a3b8;
+    }
+    body {
+      margin: 0;
+      font-family: 'Inter', Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    h1 {
+      color: var(--accent);
+      margin-bottom: 20px;
+      font-size: 28px;
+    }
+    .card {
+      background: var(--card);
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+      width: 100%;
+      max-width: 500px;
+    }
+    .button-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 20px;
+    }
+    .button-list a {
+      display: block;
+      background: var(--accent);
+      color: #fff;
+      text-decoration: none;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+    .button-list a:hover {
+      background: var(--accent-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    }
+    #cas {
+      font-size: 16px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    p.footer {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 20px;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+
+  <p id="cas">🕓 Aktuálny čas: ...</p>
+
+  <div class="card">
+    <h1>📂 Nástroje Menu</h1>
+    <div class="button-list">
+      <a href="mini-geometry-dash.html">🗂️ ErikAI zoznam APK WEB 1</a>
+      <a href="nastroje.html">👀 ErikAI Pomocné Nástroje 2</a>
+      <a href="generator_hesla_mena.html">👤 ErikAI generator náhodnosti 3</a>
+      <a href="erikukazka.html">👀 ErikAI ukážka 4</a>
+      <a href="generator_obrazkov.html">🫂 ErikAI generátor obrazomix 5</a>
+      <a href="remixsong.html">🫂 ErikAI RemixSong 6</a>
+      <a href="emoji.html">🫂 ErikAI Mixemoji 7</a>
+      <a href="prevodjednotiek.html">🫂 ErikAI Prevod Jednotiek 8</a>
+      <a href="vzorce.html">🫂 ErikAI Vzorce 9</a>
+      <a href="grafy.html">🫂 ErikAI Grafy 10</a>
+      <a href="mixnastroje.html">🫂 ErikAI MIXNASTROJE 11</a>
+      <a href="pohladnica.html"> ErikAI Pohľadnica 12</a>
+    </div>
+  </div>
+
+  <p class="footer">
+    This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.<br>
+    To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-nd/4.0/<br>
+    © 2025 Erik Mohylák – All rights reserved.
+  </p>
+
+  <script>
+    function aktualizujCas() {
+      const teraz = new Date();
+      const moznosti = {
+        weekday: 'long', year: 'numeric', month: 'long',
+        day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit'
+      };
+      document.getElementById('cas').innerText =🕓 Aktuálny čas: ${teraz.toLocaleDateString('sk-SK', moznosti)}`;
+    }
+    setInterval(aktualizujCas, 1000);
+    aktualizujCas();
+  </script>
+
+  <div id="google_translate_element"></div>
+  <script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({
+        pageLanguage: 'sk',
+        includedLanguages: 'en,cs,fr,hu,de,pl,ro,ru,es,it,uk,sr,bn,ko,ja,zh-CN',
+        layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+      }, 'google_translate_element');
+    }
+  </script>
+  <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+  
+</body>
+</html>
