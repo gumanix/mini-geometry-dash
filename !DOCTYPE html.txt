@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mini Geometry Dash</title>
+<style>
+html,body{margin:0;padding:0;height:100%;background:#081126;font-family:system-ui;color:#e6eef8}
+canvas{display:block;margin:auto;background:#071026;border-radius:8px;max-width:100%}
+button{padding:6px 12px;border-radius:6px;border:none;background:#0f1724;color:#fff;cursor:pointer}
+.menu{position:fixed;inset:0;display:flex;justify-content:center;align-items:center;background:rgba(0,0,0,0.7);z-index:10}
+.menu-panel{background:#071026;padding:16px;border-radius:12px;text-align:center}
+.skin-btn{width:36px;height:36px;margin:2px;cursor:pointer;display:inline-block;border:2px solid transparent}
+.skin-btn.selected{border-color:#fff}
+</style>
+</head>
+<body>
+<canvas id="game" width="900" height="450"></canvas>
+
+<div id="menu" class="menu">
+<div class="menu-panel">
+<h2>Mini Geometry Dash</h2>
+<div>
+<button onclick="startLevel(0)">Level 1</button>
+<button onclick="startLevel(1)">Level 2</button>
+<button onclick="startLevel(2)">Level 3</button>
+</div>
+</div>
+</div>
+
+<script>
+// jednoduchá verzia hry - 3 levely
+const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
+let W=canvas.width,H=canvas.height;
+
+let player={x:120,y:H-60,w:40,h:40,vy:0,gravity:0.9,jump:-14,onGround:true};
+let obstacles=[],distance=0,speed=6,running=false,level=0;
+
+const levels=[
+{len:2000,obs:[{x:400,w:40,h:40},{x:800,w:50,h:50}]},
+{len:3000,obs:[{x:300,w:50,h:50},{x:900,w:60,h:60}]},
+{len:4000,obs:[{x:500,w:60,h:60},{x:1200,w:50,h:50}]}
+];
+
+function startLevel(idx){
+level=idx;running=true;distance=0;player.y=H-60;obstacles=levels[idx].obs.map(o=>({...o,x:o.x}));
+document.getElementById('menu').style.display='none';
+}
+
+function jump(){if(player.onGround){player.vy=player.jump;player.onGround=false}}
+
+window.addEventListener('keydown',e=>{if(e.code==='Space'||e.code==='ArrowUp')jump()});
+
+function update(){
+if(!running)return;
+player.vy+=player.gravity;
+player.y+=player.vy;
+if(player.y+player.h>=H){player.y=H-player.h;player.vy=0;player.onGround=true;}
+obstacles.forEach(o=>o.x-=speed);
+distance+=speed;
+obstacles=obstacles.filter(o=>o.x+o.w>0);
+if(distance>=levels[level].len){running=false;alert('Level dokončený!');document.getElementById('menu').style.display='flex'}
+}
+
+function draw(){
+ctx.clearRect(0,0,W,H);
+ctx.fillStyle='#071625';ctx.fillRect(0,H-20,W,20);
+ctx.fillStyle='#ffd166';ctx.fillR
