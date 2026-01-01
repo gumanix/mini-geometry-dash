@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <title>HTML5 CS2 Lite - 1v1</title>
+    <style>
+        body { margin: 0; overflow: hidden; font-family: sans-serif; }
+        #menu {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8); color: white; padding: 20px; text-align: center;
+            border-radius: 10px; z-index: 10;
+        }
+        #crosshair {
+            position: absolute; top: 50%; left: 50%; width: 20px; height: 20px;
+            border: 2px solid lime; border-radius: 50%; transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+        #ui { position: absolute; bottom: 20px; left: 20px; color: white; font-size: 24px; pointer-events: none; }
+        button { padding: 10px 20px; margin: 10px; cursor: pointer; font-size: 16px; }
+    </style>
+</head>
+<body>
+
+    <div id="menu">
+        <h1>CS2 HTML5 1v1</h1>
+        <p>Vyber si obtiažnosť bota:</p>
+        <button onclick="startGame(0.02, 0.01)">Easy (Pomaly)</button>
+        <button onclick="startGame(0.05, 0.03)">Medium (Normal)</button>
+        <button onclick="startGame(0.1, 0.06)">Hard (Rýchly)</button>
+        <p style="font-size: 12px;">Pohyb: WASD | Streľba: Klik | Zámok myši: Klikni na hru</p>
+    </div>
+
+    <div id="crosshair"></div>
+    <div id="ui">HP: <span id="hp">100</span> | Bot HP: <span id="botHp">100</span></div>
+
+    <script type="importmap">
+        { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+
+        let scene, camera, renderer, player, bot;
+        let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
+        let botSpeed = 0.05, botAccuracy = 0.03;
+        let playerHp = 100, botHp = 100;
+        let gameRunning = false;
+
+        const clock = new THREE.Clock();
+        const raycaster = new THREE.Raycaster();
+
+        function init() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x87ceeb); // Obloha
+
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            // Svetlo
+            const light = new THREE.DirectionalLight(0xffffff, 1);
+            light.position.set(5, 10, 5);
+            scene.add(light);
+            scene.add(new THREE.AmbientLight(0x404040));
+
+            // Podlaha
+            const floorGeo = new THREE.PlaneGeometry(50, 50);
+            const floorMat = new THREE.MeshPhongMaterial({ color: 0x555555 });
+            const floor = new THREE.Mesh(floorGeo, floorMat);
+            floor.rotation.x = -Math.PI / 2;
+            scene.add(floor);
+
+            // Boxy (Prekážky)
+            for(let i=0; i<8; i++) {
+                const box = new THREE.Mesh(
+                    new THREE.BoxGeometry(2, 2, 2),
+                    new THREE.MeshPhongMaterial({ color: 0x8b4513 })
+                );
+                box.position.set(Math.random()*20-10, 1, Math.random()*20-10);
+                scene.add(box);
+            }
+
+            // Bot
+            const botGeo = new THREE.CapsuleGeometry(0.5, 1, 4, 8);
+            const botMat = new THREE.MeshPhongMaterial({ color: 0xff0000 });
+            bot = new THREE.Mesh(botGeo, botMat);
+            bot.position.set(0, 1, -15);
+            scene.add(bot);
+
+            // Ovládanie
+            document.addEventListener('keydown', (e) => {
+                if(e.code === 'KeyW') moveForward = true;
+                if(e.code === 'KeyS') moveBackward = true;
+                if(e.code === 'KeyA') moveLeft = true;
+                if(e.code === 'KeyD') moveRight = true;
+            });
+            document.addEventListener('keyup', (e) => {
+                if(e.code === 'KeyW') moveForward = false;
+                if(e.code === 'KeyS') moveBackward = false;
+                if(e.code === 'KeyA') moveLeft = false;
+                if(e.code === 'KeyD') moveRight = false;
+            });
+
+            // Myš (Pointer Lock)
+            renderer.domElement.addEventListener('click', () => {
+                if(gameRunning) renderer.domElement.requestPointerLock();
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (document.pointerLockElement === renderer.domElement) {
+                    camera.rotation.y -= e.movementX * 0.002;
+                }
+            });
+
+            // Streľba
+            window.addEventListener('mousedown', () => {
+                if(!gameRunning || document.pointerLockElement !== renderer.domElement) return;
+                
+                raycaster.setFromCamera({ x: 0, y: 0 }, camera);
+                const intersects = raycaster.intersectObject(bot);
+                
+                if (intersects.length > 0) {
+                    botHp -= 20;
+                    document.getElementById('botHp').innerText = botHp;
+                    if(botHp <= 0) { alert("Vyhral si!"); location.reload(); }
+                }
+            });
+
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            if(!gameRunning) return;
+
+            // Pohyb hráča
+            const speed = 0.1;
+            if(moveForward) camera.translateZ(-speed);
+            if(moveBackward) camera.translateZ(speed);
+            if(moveLeft) camera.translateX(-speed);
+            if(moveRight) camera.translateX(speed);
+            camera.position.y = 1.6; // Výška očí
+
+            // AI Bota (Jednoduchý pohyb k hráčovi)
+            const direction = new THREE.Vector3().subVectors(camera.position, bot.position).normalize();
+            bot.position.x += direction.x * botSpeed;
+            bot.position.z += direction.z * botSpeed;
+            bot.lookAt(camera.position.x, 1, camera.position.z);
+
+            // Bot strieľa (náhodne podľa obtiažnosti)
+            if(Math.random() < botAccuracy) {
+                playerHp -= 1;
+                document.getElementById('hp').innerText = playerHp;
+                if(playerHp <= 0) { alert("Prehral si!"); location.reload(); }
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        window.startGame = (speed, acc) => {
+            botSpeed = speed;
+            botAccuracy = acc;
+            gameRunning = true;
+            document.getElementById('menu').style.display = 'none';
+            init();
+        };
+    </script>
+</body>
+</html>
